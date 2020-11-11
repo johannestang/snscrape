@@ -19,7 +19,9 @@ class InstagramPost(snscrape.base.Item):
 	content: str
 	thumbnailUrl: str
 	displayUrl: str
+	id: str
 	username: str
+	userId: str
 	likes: int
 	comments: int
 	commentsDisabled: bool
@@ -85,6 +87,7 @@ class InstagramCommonScraper(snscrape.base.Scraper):
 		for node in response[self._responseContainer][self._edgeXToMedia]['edges']:
 			code = node['node']['shortcode']
 			username = node['node']['owner']['username'] if 'username' in node['node']['owner'] else ''
+			userId = node['node']['owner']['id'] if 'id' in node['node']['owner'] else ''
 			usernameQuery = '?taken-by=' + username
 			cleanUrl = f'https://www.instagram.com/p/{code}/'
 			yield InstagramPost(
@@ -94,7 +97,9 @@ class InstagramCommonScraper(snscrape.base.Scraper):
 			  content = node['node']['edge_media_to_caption']['edges'][0]['node']['text'] if len(node['node']['edge_media_to_caption']['edges']) else None,
 			  thumbnailUrl = node['node']['thumbnail_src'],
 			  displayUrl = node['node']['display_url'],
+			  id = node['node']['id'],
 			  username = username,
+			  userId = userId,
 			  likes = node['node']['edge_media_preview_like']['count'],
 			  comments = node['node']['edge_media_to_comment']['count'],
 			  commentsDisabled = node['node']['comments_disabled'],
